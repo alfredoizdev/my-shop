@@ -1,7 +1,7 @@
-import { ICartProduct } from "interfaces/cart";
 import { FunctionComponent, useEffect, useReducer } from "react";
+import { ICartProduct, IShippingAddress } from "interfaces";
 import { CartContext, cartReducer } from "./";
-import Cookie from "js-cookie";
+import Cookies from "js-cookie";
 
 export interface CartState {
 	isLoaded: boolean;
@@ -10,6 +10,7 @@ export interface CartState {
 	subTotal: number;
 	tax: number;
 	total: number;
+	shippingAddress?: IShippingAddress;
 }
 
 const CART_INITIAL_STATE: CartState = {
@@ -19,6 +20,8 @@ const CART_INITIAL_STATE: CartState = {
 	subTotal: 0,
 	tax: 0,
 	total: 0,
+
+	shippingAddress: undefined,
 };
 
 interface Props {}
@@ -28,8 +31,8 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 
 	useEffect(() => {
 		try {
-			const cookieProducts = Cookie.get("cart")
-				? JSON.parse(Cookie.get("cart")!)
+			const cookieProducts = Cookies.get("cart")
+				? JSON.parse(Cookies.get("cart")!)
 				: [];
 
 			dispatch({
@@ -45,7 +48,27 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 	}, []);
 
 	useEffect(() => {
-		Cookie.set("cart", JSON.stringify(state.cart));
+		if (Cookies.get("firstname")) {
+			const address: IShippingAddress = {
+				firstname: Cookies.get("firtsname") || "",
+				lastname: Cookies.get("lastname") || "",
+				address: Cookies.get("address") || "",
+				address2: Cookies.get("address2") || "",
+				zip: Cookies.get("zip") || "",
+				city: Cookies.get("city") || "",
+				country: Cookies.get("country") || "",
+				phone: Cookies.get("phone") || "",
+			};
+
+			dispatch({
+				type: "[Cart] - Load address from cookies",
+				payload: address,
+			});
+		}
+	}, []);
+
+	useEffect(() => {
+		Cookies.set("cart", JSON.stringify(state.cart));
 	}, [state.cart]);
 
 	useEffect(() => {
