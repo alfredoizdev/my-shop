@@ -30,7 +30,7 @@ import { useRouter } from "next/router";
 const SideMenu: FC = () => {
 	const router = useRouter();
 	const { isMenuOpen, toggleSideMenu } = useContext(UiContext);
-	const { isLoggedIn, user } = useContext(AuthContext);
+	const { isLoggedIn, user, logout } = useContext(AuthContext);
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const onSearchTerm = () => {
@@ -129,7 +129,9 @@ const SideMenu: FC = () => {
 							</ListItemIcon>
 							<ListItemText
 								primary={"Login"}
-								onClick={() => navigationTo("/auth/login")}
+								onClick={() =>
+									navigationTo(`/auth/login?p=${router.asPath}`)
+								}
 							/>
 						</ListItem>
 					) : (
@@ -137,7 +139,7 @@ const SideMenu: FC = () => {
 							<ListItemIcon>
 								<LoginOutlined />
 							</ListItemIcon>
-							<ListItemText primary={"Logout"} />
+							<ListItemText primary={"Logout"} onClick={logout} />
 						</ListItem>
 					)}
 
