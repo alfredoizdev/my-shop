@@ -7,3 +7,8 @@ export interface IUser {
 	createdAt: string;
 	updatedAt: string;
 }
+
+export interface IUserToken {
+	token?: string;
+	user: IUser;
+}

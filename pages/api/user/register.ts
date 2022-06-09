@@ -35,10 +35,10 @@ const registerUser = async (
 	res: NextApiResponse<Data>
 ) => {
 	const {
+		name = "",
 		email = "",
 		password = "",
-		name = "",
-	} = req.body as { email: string; password: string; name: string };
+	} = req.body as { name: string; email: string; password: string };
 
 	if (password.length < 6) {
 		return res
