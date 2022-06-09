@@ -19,14 +19,14 @@ import {
 interface Props {}
 
 const CartPage: FunctionComponent<Props> = ({}) => {
-	const { isLoaded, numberOfItems } = useContext(CartContext);
+	const { isLoaded, cart } = useContext(CartContext);
 	const router = useRouter();
 
 	useEffect(() => {
-		if (isLoaded && numberOfItems === 0) {
+		if (isLoaded && cart.length === 0) {
 			router.replace("/cart/empty");
 		}
-	}, [isLoaded, numberOfItems, router]);
+	}, [isLoaded, cart, router]);
 
 	if (!isLoaded) {
 		return <></>;
@@ -52,6 +52,7 @@ const CartPage: FunctionComponent<Props> = ({}) => {
 									color="secondary"
 									className="circular-btn"
 									fullWidth
+									href="/checkout/address"
 								>
 									Checkout
 								</Button>
