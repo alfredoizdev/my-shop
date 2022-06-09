@@ -23,6 +23,8 @@ export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 
 	useEffect(() => {
 		const checkToken = async () => {
+			if (!Cookies.get("token")) return;
+
 			try {
 				const { data } = await shopApi.get<IUserToken>(
 					"user/validate-token"
