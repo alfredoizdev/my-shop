@@ -4,16 +4,18 @@ import { CartContext, cartReducer } from "./";
 import Cookie from "js-cookie";
 
 export interface CartState {
+	isLoaded: boolean;
 	cart: ICartProduct[];
-	numbeOfItems: number;
+	numberOfItems: number;
 	subTotal: number;
 	tax: number;
 	total: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
+	isLoaded: false,
 	cart: [],
-	numbeOfItems: 0,
+	numberOfItems: 0,
 	subTotal: 0,
 	tax: 0,
 	total: 0,
@@ -48,7 +50,7 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 
 	useEffect(() => {
 		// sumamos lo que tenemos en el cart current quantity + prev
-		const numbeOfItems = state.cart.reduce(
+		const numberOfItems = state.cart.reduce(
 			(prev, current) => current.quantity + prev,
 			0
 		);
@@ -61,7 +63,7 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 		const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
 
 		const orderSumary = {
-			numbeOfItems,
+			numberOfItems,
 			subTotal,
 			tax: subTotal * taxRate,
 			total: subTotal * (taxRate + 1),

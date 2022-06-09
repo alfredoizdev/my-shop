@@ -1,4 +1,11 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext, useEffect } from "react";
+import { useRouter } from "next/router";
+
+import CartList from "components/cart/CartList";
+import OrderSummary from "components/cart/OrderSummary";
+import ShopLayout from "components/layouts/ShopLayout";
+import { CartContext } from "context/cart/CartContext";
+
 import {
 	Box,
 	Button,
@@ -8,13 +15,23 @@ import {
 	Grid,
 	Typography,
 } from "@mui/material";
-import CartList from "components/cart/CartList";
-import OrderSummary from "components/cart/OrderSummary";
-import ShopLayout from "components/layouts/ShopLayout";
 
 interface Props {}
 
 const CartPage: FunctionComponent<Props> = ({}) => {
+	const { isLoaded, numberOfItems } = useContext(CartContext);
+	const router = useRouter();
+
+	useEffect(() => {
+		if (isLoaded && numberOfItems === 0) {
+			router.replace("/cart/empty");
+		}
+	}, [isLoaded, numberOfItems, router]);
+
+	if (!isLoaded) {
+		return <></>;
+	}
+
 	return (
 		<ShopLayout title="Shopping Cart" pageDescription="Shopping Cart">
 			<Typography variant="h1" component="h1">

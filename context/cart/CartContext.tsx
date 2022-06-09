@@ -2,8 +2,9 @@ import { ICartProduct } from "interfaces/cart";
 import { createContext } from "react";
 
 interface contextProps {
+	isLoaded: boolean;
 	cart: ICartProduct[];
-	numbeOfItems: number;
+	numberOfItems: number;
 	subTotal: number;
 	tax: number;
 	total: number;

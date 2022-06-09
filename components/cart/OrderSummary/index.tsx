@@ -6,16 +6,16 @@ import { utilCurrency } from "utils";
 interface Props {}
 
 const OrderSummary: FunctionComponent<Props> = ({}) => {
-	const { numbeOfItems, subTotal, total, tax } = useContext(CartContext);
+	const { numberOfItems, subTotal, total, tax } = useContext(CartContext);
 	return (
 		<Grid container>
 			<Grid item xs={6}>
 				<Typography>
-					Number of {numbeOfItems > 1 ? "products" : "product"}{" "}
+					Number of {numberOfItems > 1 ? "products" : "product"}{" "}
 				</Typography>
 			</Grid>
 			<Grid item xs={6} display="flex" justifyContent="flex-end">
-				<Typography>{numbeOfItems}</Typography>
+				<Typography>{numberOfItems}</Typography>
 			</Grid>
 			<Grid item xs={6}>
 				<Typography>Sub Total</Typography>

@@ -23,7 +23,7 @@ import {
 const Navbar: FC = () => {
 	const { asPath, push } = useRouter();
 	const { toggleSideMenu } = useContext(UiContext);
-	const { numbeOfItems } = useContext(CartContext);
+	const { numberOfItems } = useContext(CartContext);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isSearchVisible, setIsSearchVisible] = useState(false);
 
@@ -129,7 +129,7 @@ const Navbar: FC = () => {
 				<NextLink href="/cart" passHref>
 					<IconButton>
 						<Badge
-							badgeContent={numbeOfItems > 9 ? "+9" : numbeOfItems}
+							badgeContent={numberOfItems > 9 ? "+9" : numberOfItems}
 							color="secondary"
 						>
 							<ShoppingCartOutlined />
