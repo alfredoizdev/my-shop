@@ -1,7 +1,10 @@
 import { createContext } from "react";
+import { ICountry } from "interfaces";
 
 interface contextProps {
 	isMenuOpen: boolean;
+	countries: ICountry[];
+	// method
 	toggleSideMenu: () => void;
 }
 
