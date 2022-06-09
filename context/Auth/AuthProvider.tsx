@@ -1,10 +1,13 @@
 import { FunctionComponent, useEffect, useReducer } from "react";
+import { useRouter } from "next/router";
+
+import Cookies from "js-cookie";
+import axios from "axios";
+
 import { AuthContext, authReducer } from "./";
 import { IUser } from "interfaces";
 import { shopApi } from "api";
-import Cookies from "js-cookie";
-import { IUserToken } from "../../interfaces/user";
-import axios from "axios";
+import { IUserToken } from "interfaces/user";
 
 export interface AuthState {
 	isLoggedIn: boolean;
@@ -20,6 +23,7 @@ interface Props {}
 
 export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
+	const router = useRouter();
 
 	useEffect(() => {
 		const checkToken = async () => {
@@ -94,6 +98,13 @@ export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 		}
 	};
 
+	const logout = () => {
+		Cookies.remove("token");
+		Cookies.remove("cart");
+
+		router.reload();
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -101,6 +112,7 @@ export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 				//method
 				loginUser,
 				registerUser,
+				logout,
 			}}
 		>
 			{children}
