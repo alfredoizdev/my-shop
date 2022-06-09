@@ -1,5 +1,5 @@
 export type OrderSumary = {
-	numbeOfItems: number;
+	numberOfItems: number;
 	subTotal: number;
 	tax: number;
 	total: number;
