@@ -1,5 +1,5 @@
 import { FC, useContext, useState } from "react";
-import { UiContext } from "context";
+import { UiContext, AuthContext } from "context";
 import {
 	Box,
 	Divider,
@@ -30,6 +30,7 @@ import { useRouter } from "next/router";
 const SideMenu: FC = () => {
 	const router = useRouter();
 	const { isMenuOpen, toggleSideMenu } = useContext(UiContext);
+	const { isLoggedIn, user } = useContext(AuthContext);
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const onSearchTerm = () => {
@@ -73,19 +74,23 @@ const SideMenu: FC = () => {
 						/>
 					</ListItem>
 
-					<ListItem button>
-						<ListItemIcon>
-							<AccountCircleOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"Profile"} />
-					</ListItem>
+					{isLoggedIn && (
+						<>
+							<ListItem button>
+								<ListItemIcon>
+									<AccountCircleOutlined />
+								</ListItemIcon>
+								<ListItemText primary={"Profile"} />
+							</ListItem>
 
-					<ListItem button>
-						<ListItemIcon>
-							<ConfirmationNumberOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"My Ordenes"} />
-					</ListItem>
+							<ListItem button>
+								<ListItemIcon>
+									<ConfirmationNumberOutlined />
+								</ListItemIcon>
+								<ListItemText primary={"My Ordenes"} />
+							</ListItem>
+						</>
+					)}
 
 					<ListItem button sx={{ display: { xs: "", sm: "none" } }}>
 						<ListItemIcon>
@@ -117,43 +122,53 @@ const SideMenu: FC = () => {
 						/>
 					</ListItem>
 
-					<ListItem button>
-						<ListItemIcon>
-							<VpnKeyOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"Login"} />
-					</ListItem>
-
-					<ListItem button>
-						<ListItemIcon>
-							<LoginOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"Logout"} />
-					</ListItem>
+					{!isLoggedIn ? (
+						<ListItem button>
+							<ListItemIcon>
+								<VpnKeyOutlined />
+							</ListItemIcon>
+							<ListItemText
+								primary={"Login"}
+								onClick={() => navigationTo("/auth/login")}
+							/>
+						</ListItem>
+					) : (
+						<ListItem button>
+							<ListItemIcon>
+								<LoginOutlined />
+							</ListItemIcon>
+							<ListItemText primary={"Logout"} />
+						</ListItem>
+					)}
 
 					{/* Admin */}
-					<Divider />
-					<ListSubheader>Admin Panel</ListSubheader>
 
-					<ListItem button>
-						<ListItemIcon>
-							<CategoryOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"Product"} />
-					</ListItem>
-					<ListItem button>
-						<ListItemIcon>
-							<ConfirmationNumberOutlined />
-						</ListItemIcon>
-						<ListItemText primary={"Ordens"} />
-					</ListItem>
+					{user?.role === "admin" && (
+						<>
+							<Divider />
+							<ListSubheader>Admin Panel</ListSubheader>
 
-					<ListItem button>
-						<ListItemIcon>
-							<AdminPanelSettings />
-						</ListItemIcon>
-						<ListItemText primary={"Users"} />
-					</ListItem>
+							<ListItem button>
+								<ListItemIcon>
+									<CategoryOutlined />
+								</ListItemIcon>
+								<ListItemText primary={"Product"} />
+							</ListItem>
+							<ListItem button>
+								<ListItemIcon>
+									<ConfirmationNumberOutlined />
+								</ListItemIcon>
+								<ListItemText primary={"Ordens"} />
+							</ListItem>
+
+							<ListItem button>
+								<ListItemIcon>
+									<AdminPanelSettings />
+								</ListItemIcon>
+								<ListItemText primary={"Users"} />
+							</ListItem>
+						</>
+					)}
 				</List>
 			</Box>
 		</Drawer>
