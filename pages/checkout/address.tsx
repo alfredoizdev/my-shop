@@ -1,6 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { NextPage } from "next";
-import { CartContext, UiContext } from "context";
+import { UiContext, ShippingContext } from "context";
 import ShopLayout from "components/layouts/ShopLayout";
 import {
 	Box,
@@ -18,44 +18,60 @@ import { useRouter } from "next/router";
 interface Props {}
 
 type FormDate = {
-	firstname: string;
-	lastname: string;
-	address: string;
-	address2: string;
-	zip: string;
-	city: string;
-	country: string;
-	phone: string;
-};
-
-const getAddressFromCookies = (): FormDate => {
-	return {
-		firstname: Cookies.get("firtsname") || "",
-		lastname: Cookies.get("lastname") || "",
-		address: Cookies.get("address") || "",
-		address2: Cookies.get("address2") || "",
-		zip: Cookies.get("zip") || "",
-		city: Cookies.get("city") || "",
-		country: Cookies.get("country") || "",
-		phone: Cookies.get("phone") || "",
+	formValue: {
+		firstname: string;
+		lastname: string;
+		address: string;
+		address2: string;
+		zip: string;
+		city: string;
+		country: string;
+		phone: string;
 	};
 };
 
 const Address: NextPage<Props> = ({}) => {
 	const { countries } = useContext(UiContext);
-	const { updateAddress } = useContext(CartContext);
+	const { updateAddress, shippingAddress } = useContext(ShippingContext);
 	const router = useRouter();
 
 	const {
 		register,
 		handleSubmit,
+		setValue,
 		formState: { errors },
 	} = useForm<FormDate>({
-		defaultValues: getAddressFromCookies(),
+		defaultValues: {
+			formValue: {
+				firstname: "",
+				lastname: "",
+				address: "",
+				address2: "",
+				zip: "",
+				city: "",
+				country: "",
+				phone: "",
+			},
+		},
 	});
 
-	const onAddressChange = (data: FormDate) => {
-		updateAddress(data);
+	useEffect(() => {
+		if (shippingAddress) {
+			setValue("formValue", {
+				firstname: shippingAddress?.firstname,
+				lastname: shippingAddress?.lastname,
+				address: shippingAddress?.address,
+				address2: shippingAddress?.address2,
+				city: shippingAddress?.city,
+				phone: shippingAddress?.phone,
+				country: shippingAddress?.country,
+				zip: shippingAddress?.zip,
+			});
+		}
+	}, [shippingAddress, setValue]);
+
+	const onAddressChange = ({ formValue }: FormDate) => {
+		updateAddress(formValue);
 		router.push("/checkout/summary");
 	};
 
@@ -75,15 +91,15 @@ const Address: NextPage<Props> = ({}) => {
 							type="text"
 							variant="filled"
 							fullWidth
-							{...register("firstname", {
+							{...register("formValue.firstname", {
 								required: "The field is required",
 								minLength: {
 									value: 3,
 									message: "Name must has more them 3 characters",
 								},
 							})}
-							error={!!errors.firstname}
-							helperText={errors.firstname?.message || ""}
+							error={!!errors.formValue?.firstname}
+							helperText={errors.formValue?.firstname?.message || ""}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
@@ -92,15 +108,15 @@ const Address: NextPage<Props> = ({}) => {
 							type="text"
 							variant="filled"
 							fullWidth
-							{...register("lastname", {
+							{...register("formValue.lastname", {
 								required: "The field is required",
 								minLength: {
 									value: 3,
 									message: "Last Name must has more them 3 characters",
 								},
 							})}
-							error={!!errors.lastname}
-							helperText={errors.lastname?.message || ""}
+							error={!!errors.formValue?.lastname}
+							helperText={errors.formValue?.lastname?.message || ""}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
@@ -108,11 +124,11 @@ const Address: NextPage<Props> = ({}) => {
 							label="Address"
 							variant="filled"
 							fullWidth
-							{...register("address", {
+							{...register("formValue.address", {
 								required: "The field is required",
 							})}
-							error={!!errors.address}
-							helperText={errors.address?.message || ""}
+							error={!!errors.formValue?.address}
+							helperText={errors.formValue?.address?.message || ""}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
@@ -120,11 +136,11 @@ const Address: NextPage<Props> = ({}) => {
 							label="Address 2 (optional)"
 							variant="filled"
 							fullWidth
-							{...register("address2")}
+							{...register("formValue.address2")}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
-						<FormControl fullWidth {...register("country")}>
+						<FormControl fullWidth {...register("formValue.country")}>
 							{countries.length > 0 && (
 								<>
 									<TextField
@@ -132,12 +148,12 @@ const Address: NextPage<Props> = ({}) => {
 										variant="filled"
 										label="country"
 										defaultValue={
-											Cookies.get("country") || countries[0].code
+											shippingAddress?.country || countries[0].code
 										}
-										{...register("country", {
+										{...register("formValue.country", {
 											required: "This field is required",
 										})}
-										error={!!errors.country}
+										error={!!errors.formValue?.country}
 									>
 										{countries.map((country) => (
 											<MenuItem
@@ -157,11 +173,11 @@ const Address: NextPage<Props> = ({}) => {
 							label="City"
 							variant="filled"
 							fullWidth
-							{...register("city", {
+							{...register("formValue.city", {
 								required: "The field is required",
 							})}
-							error={!!errors.city}
-							helperText={errors.city?.message || ""}
+							error={!!errors.formValue?.city}
+							helperText={errors.formValue?.city?.message || ""}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
@@ -169,11 +185,11 @@ const Address: NextPage<Props> = ({}) => {
 							label="Zipcode"
 							variant="filled"
 							fullWidth
-							{...register("zip", {
+							{...register("formValue.zip", {
 								required: "The field is required",
 							})}
-							error={!!errors.zip}
-							helperText={errors.zip?.message || ""}
+							error={!!errors.formValue?.zip}
+							helperText={errors.formValue?.zip?.message || ""}
 						/>
 					</Grid>
 					<Grid item xs={12} sm={6}>
@@ -181,11 +197,11 @@ const Address: NextPage<Props> = ({}) => {
 							label="Phone Number"
 							variant="filled"
 							fullWidth
-							{...register("phone", {
+							{...register("formValue.phone", {
 								required: "The field is required",
 							})}
-							error={!!errors.phone}
-							helperText={errors.phone?.message || ""}
+							error={!!errors.formValue?.phone}
+							helperText={errors.formValue?.phone?.message || ""}
 						/>
 					</Grid>
 				</Grid>

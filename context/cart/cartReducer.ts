@@ -23,15 +23,15 @@ type CartActionType =
 	| {
 			type: "[Cart] - Update order summary";
 			payload: OrderSumary;
-	  }
-	| {
-			type: "[Cart] - Load address from cookies";
-			payload: IShippingAddress;
-	  }
-	| {
-			type: "[Cart] - Update address";
-			payload: IShippingAddress;
 	  };
+// | {
+// 		type: "[Cart] - Load address from cookies";
+// 		payload: IShippingAddress;
+//   }
+// | {
+// 		type: "[Cart] - Update address";
+// 		payload: IShippingAddress;
+//   };
 
 export const cartReducer = (
 	state: CartState,
@@ -78,9 +78,9 @@ export const cartReducer = (
 				...action.payload,
 			};
 
-		case "[Cart] - Load address from cookies":
-		case "[Cart] - Update address":
-			return { ...state, shippingAddress: action.payload };
+		// case "[Cart] - Load address from cookies":
+		// case "[Cart] - Update address":
+		// 	return { ...state, shippingAddress: action.payload };
 
 		default:
 			return state;

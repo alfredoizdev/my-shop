@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { lightTheme } from "themes";
 import { SWRConfig } from "swr";
 import { AuthProvider, CartProvider, UiProvider } from "context";
+import { ShippingProvider } from "context/shipping";
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
@@ -14,14 +15,16 @@ function MyApp({ Component, pageProps }: AppProps) {
 			}}
 		>
 			<AuthProvider>
-				<CartProvider>
-					<UiProvider>
-						<ThemeProvider theme={lightTheme}>
-							<CssBaseline />
-							<Component {...pageProps} />
-						</ThemeProvider>
-					</UiProvider>
-				</CartProvider>
+				<ShippingProvider>
+					<CartProvider>
+						<UiProvider>
+							<ThemeProvider theme={lightTheme}>
+								<CssBaseline />
+								<Component {...pageProps} />
+							</ThemeProvider>
+						</UiProvider>
+					</CartProvider>
+				</ShippingProvider>
 			</AuthProvider>
 		</SWRConfig>
 	);

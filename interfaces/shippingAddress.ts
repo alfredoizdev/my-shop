@@ -7,4 +7,5 @@ export interface IShippingAddress {
 	city: string;
 	country: string;
 	phone: string;
+	userId?: string;
 }

@@ -10,11 +10,7 @@ const addressSchema = new Schema({
 	city: { type: String, require: true },
 	country: { type: String, require: true },
 	phone: { type: String, require: true },
-	user: {
-		type: mongoose.Schema.Types.ObjectId,
-		required: false,
-		ref: "User",
-	},
+	userId: { type: String, required: true },
 });
 
 const Address: Model<IShippingAddress> =

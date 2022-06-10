@@ -38,6 +38,7 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 		zip = "",
 		phone = "",
 		country = "",
+		city = "",
 	} = req.body as {
 		address: string;
 		address2: string;
@@ -46,6 +47,7 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 		zip: string;
 		phone: string;
 		country: string;
+		city: string;
 	};
 
 	if (address.trim() === "") {
@@ -56,7 +58,7 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 			.status(400)
 			.json({ message: "the Firstname must no be empty" });
 	}
-	if (firstname.length > 2) {
+	if (firstname.length <= 2) {
 		return res
 			.status(400)
 			.json({ message: "the firstname should has more the 2 characters" });
@@ -64,7 +66,7 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 	if (lastname.trim() === "") {
 		return res.status(400).json({ message: "the lastname must no be empty" });
 	}
-	if (lastname.length > 2) {
+	if (lastname.length <= 2) {
 		return res
 			.status(400)
 			.json({ message: "the Lastname should has more the 2 characters" });
@@ -78,6 +80,9 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 	if (country.trim() === "") {
 		return res.status(400).json({ message: "the Country must no be empty" });
 	}
+	if (city.trim() === "") {
+		return res.status(400).json({ message: "the City must no be empty" });
+	}
 
 	let userId = "";
 
@@ -87,32 +92,48 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 		return res.status(401).json({ message: "Token are no valid" });
 	}
 
-	const shippingAddress = new Address({
-		address,
-		address2,
-		zip,
-		firstname,
-		lastname,
-		country,
-		phone,
-	});
-
 	try {
 		await db.connect();
-		await shippingAddress.save();
-		const userById = await User.findById(userId);
 
-		if (userById) {
-			console.log("find user added address");
-			userById.address = shippingAddress;
-			await userById.save();
+		const addressOnFile = await Address.findOne({ userId }).limit(1);
+		if (addressOnFile) {
+			addressOnFile.address = address;
+			addressOnFile.address2 = address2;
+			addressOnFile.firstname = firstname;
+			addressOnFile.lastname = lastname;
+			addressOnFile.city = city;
+			addressOnFile.country = country;
+			addressOnFile.phone = phone;
+
+			await addressOnFile.save();
+			await db.disconnect();
+			return res.status(201).json({ address: addressOnFile });
+		} else {
+			const shippingAddress = new Address({
+				address,
+				address2,
+				zip,
+				firstname,
+				lastname,
+				country,
+				phone,
+				city,
+				userId,
+			});
+			await shippingAddress.save();
+			const userById = await User.findById(userId);
+
+			if (userById) {
+				userById.address = shippingAddress;
+				await userById.save();
+			}
+			return res.status(201).json({ address: shippingAddress });
 		}
 	} catch (error) {
 		await db.disconnect();
+		console.log(error);
 		return res.status(500).json({ message: "Error on create address" });
 	}
-
-	return res.status(201).json({ address: shippingAddress });
 };
 
 const getAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
