@@ -13,10 +13,11 @@ import {
 import CartList from "components/cart/CartList";
 import OrderSummary from "components/cart/OrderSummary";
 import ShopLayout from "components/layouts/ShopLayout";
-import { CartContext, UiContext } from "context";
+import { CartContext, ShippingContext, UiContext } from "context";
 
 const SummaryPage: FunctionComponent = () => {
-	const { shippingAddress, numberOfItems } = useContext(CartContext);
+	const { numberOfItems } = useContext(CartContext);
+	const { shippingAddress } = useContext(ShippingContext);
 	const { countries } = useContext(UiContext);
 
 	const setCountryInAddress = () => {
