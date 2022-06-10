@@ -1,4 +1,5 @@
 import bcryptjs from "bcryptjs";
+import { IShippingAddress } from "../interfaces/shippingAddress";
 
 interface SeedProduct {
 	description: string;
@@ -17,6 +18,7 @@ interface SeedUser {
 	name: string;
 	email: string;
 	password: string;
+	address?: IShippingAddress | null;
 	role: "admin" | "client";
 }
 
@@ -40,18 +42,14 @@ export const initialData: SeedData = {
 			name: "Alfredo Izquierdo",
 			email: "alfredo@mail.com",
 			password: bcryptjs.hashSync("123456"),
+			address: null,
 			role: "admin",
 		},
 		{
 			name: "Luis Gonzales",
 			email: "luis@mail.com",
 			password: bcryptjs.hashSync("123456"),
-			role: "client",
-		},
-		{
-			name: "Esmeralda Manda",
-			email: "esmeralda@mail.com",
-			password: bcryptjs.hashSync("123456"),
+			address: null,
 			role: "client",
 		},
 	],
