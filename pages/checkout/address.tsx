@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { NextPage } from "next";
-import { UiContext } from "context";
+import { CartContext, UiContext } from "context";
 import ShopLayout from "components/layouts/ShopLayout";
 import {
 	Box,
@@ -43,6 +43,7 @@ const getAddressFromCookies = (): FormDate => {
 
 const Address: NextPage<Props> = ({}) => {
 	const { countries } = useContext(UiContext);
+	const { updateAddress } = useContext(CartContext);
 	const router = useRouter();
 
 	const {
@@ -54,15 +55,7 @@ const Address: NextPage<Props> = ({}) => {
 	});
 
 	const onAddressChange = (data: FormDate) => {
-		Cookies.set("firtsname", data.firstname);
-		Cookies.set("lastname", data.lastname);
-		Cookies.set("address", data.address);
-		Cookies.set("address2", data.address2 || "");
-		Cookies.set("zip", data.zip);
-		Cookies.set("city", data.city);
-		Cookies.set("country", data.country);
-		Cookies.set("phone", data.phone);
-
+		updateAddress(data);
 		router.push("/checkout/summary");
 	};
 
@@ -138,10 +131,13 @@ const Address: NextPage<Props> = ({}) => {
 										select
 										variant="filled"
 										label="country"
-										defaultValue={countries[0].code}
+										defaultValue={
+											Cookies.get("country") || countries[0].code
+										}
 										{...register("country", {
 											required: "This field is required",
 										})}
+										error={!!errors.country}
 									>
 										{countries.map((country) => (
 											<MenuItem

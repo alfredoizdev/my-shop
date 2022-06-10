@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
 import NextLink from "next/link";
 import {
 	Box,
@@ -13,10 +13,25 @@ import {
 import CartList from "components/cart/CartList";
 import OrderSummary from "components/cart/OrderSummary";
 import ShopLayout from "components/layouts/ShopLayout";
+import { CartContext, UiContext } from "context";
 
-interface Props {}
+const SummaryPage: FunctionComponent = () => {
+	const { shippingAddress, numberOfItems } = useContext(CartContext);
+	const { countries } = useContext(UiContext);
 
-const SummaryPage: FunctionComponent<Props> = ({}) => {
+	const setCountryInAddress = () => {
+		return countries.find(
+			(contry) => contry.code === shippingAddress?.country
+		)?.name;
+	};
+
+	if (!shippingAddress) {
+		return <></>;
+	}
+
+	const { firstname, lastname, zip, address, address2, phone, city } =
+		shippingAddress;
+
 	return (
 		<ShopLayout title="Resume of order" pageDescription="Resume of the order">
 			<Typography variant="h1" component="h1" sx={{ my: 2 }}>
@@ -29,7 +44,10 @@ const SummaryPage: FunctionComponent<Props> = ({}) => {
 				<Grid item xs={12} sm={5}>
 					<Card className="summary-card">
 						<CardContent>
-							<Typography variant="h2">Summary (3 products)</Typography>
+							<Typography variant="h2">
+								Summary ({numberOfItems}{" "}
+								{numberOfItems === 1 ? "product" : "products"})
+							</Typography>
 							<Divider sx={{ my: 1 }} />
 
 							<Box display="flex" justifyContent="flex-end">
@@ -42,11 +60,17 @@ const SummaryPage: FunctionComponent<Props> = ({}) => {
 								Address of the Shipping
 							</Typography>
 
-							<Typography>Alfredo Izquierdo</Typography>
-							<Typography>9411 w mcnab</Typography>
-							<Typography>Tamarac, Fl 33321</Typography>
-							<Typography>Usa</Typography>
-							<Typography>+14536778990</Typography>
+							<Typography>
+								{firstname} {lastname}
+							</Typography>
+							<Typography>
+								{address} {address2 ? `,${address2}` : ""}
+							</Typography>
+							<Typography>
+								{city},{zip}
+							</Typography>
+							<Typography>{setCountryInAddress()}</Typography>
+							<Typography>+{phone}</Typography>
 							<Divider sx={{ my: 1 }} />
 							<Box display="flex" justifyContent="flex-end">
 								<NextLink href="/cart" passHref>
