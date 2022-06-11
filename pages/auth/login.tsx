@@ -49,8 +49,6 @@ const LoginPage: NextPage = ({}) => {
 		gettingProvider();
 	}, []);
 
-	console.log(providers);
-
 	const {
 		register,
 		handleSubmit,
@@ -152,20 +150,24 @@ const LoginPage: NextPage = ({}) => {
 							flexDirection="column"
 						>
 							<Divider sx={{ width: "100%", mb: 2 }} />
-							{Object.values(providers as any)
-								.filter((p: any) => p.id !== "credentials")
-								.map((provider: any) => (
-									<Button
-										key={provider.id}
-										variant="outlined"
-										fullWidth
-										color="primary"
-										sx={{ mb: 1 }}
-										onClick={() => signIn(provider.id)}
-									>
-										{provider.name}
-									</Button>
-								))}
+							{providers && (
+								<>
+									{Object.values(providers as any)
+										.filter((p: any) => p.id !== "credentials")
+										.map((provider: any) => (
+											<Button
+												key={provider.id}
+												variant="outlined"
+												fullWidth
+												color="primary"
+												sx={{ mb: 1 }}
+												onClick={() => signIn(provider.id)}
+											>
+												{provider.name}
+											</Button>
+										))}
+								</>
+							)}
 						</Grid>
 					</Grid>
 				</Box>

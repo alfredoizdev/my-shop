@@ -12,7 +12,6 @@ import {
 	Typography,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 
 interface Props {}
@@ -147,7 +146,11 @@ const Address: NextPage<Props> = ({}) => {
 										select
 										variant="filled"
 										label="country"
+										fullWidth
 										defaultValue={
+											shippingAddress?.country || countries[0].code
+										}
+										key={
 											shippingAddress?.country || countries[0].code
 										}
 										{...register("formValue.country", {
