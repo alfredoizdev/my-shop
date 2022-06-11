@@ -1,8 +1,13 @@
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { GetServerSideProps } from "next";
 import NextLink from "next/link";
-import { getSession, signIn } from "next-auth/react";
+import {
+	getSession,
+	signIn,
+	getProviders,
+	ClientSafeProvider,
+} from "next-auth/react";
 import AuthLayout from "components/layouts/AuthLayout";
 import {
 	Box,
@@ -12,31 +17,39 @@ import {
 	Typography,
 	Link,
 	Chip,
+	Divider,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { LiteralUnion, useForm } from "react-hook-form";
 import { validation } from "utils";
-import { shopApi } from "api";
 import { ErrorOutline } from "@mui/icons-material";
-import { AuthContext } from "context/Auth/AuthContext";
+//import { AuthContext } from "context/Auth/AuthContext";
 import { useRouter } from "next/router";
+import { BuiltInProviderType } from "next-auth/providers";
 
 type FormDate = {
 	email: string;
 	password: string;
 };
 
-type UserData = {
-	token: string;
-	user: {
-		email: string;
-		_id: string;
-	};
-};
-
 const LoginPage: NextPage = ({}) => {
 	const router = useRouter();
 	const [showError, setShowError] = useState(false);
-	const { loginUser } = useContext(AuthContext);
+	const [providers, setProviders] = useState<Record<
+		LiteralUnion<BuiltInProviderType, string>,
+		ClientSafeProvider
+	> | null>(null);
+	// const { loginUser } = useContext(AuthContext);
+
+	useEffect(() => {
+		const gettingProvider = async () => {
+			const prov = await getProviders();
+			setProviders(prov);
+		};
+
+		gettingProvider();
+	}, []);
+
+	console.log(providers);
 
 	const {
 		register,
@@ -130,6 +143,29 @@ const LoginPage: NextPage = ({}) => {
 							>
 								<Link underline="always">I dont have an account</Link>
 							</NextLink>
+						</Grid>
+						<Grid
+							item
+							xs={12}
+							display="flex"
+							justifyContent="end"
+							flexDirection="column"
+						>
+							<Divider sx={{ width: "100%", mb: 2 }} />
+							{Object.values(providers as any)
+								.filter((p: any) => p.id !== "credentials")
+								.map((provider: any) => (
+									<Button
+										key={provider.id}
+										variant="outlined"
+										fullWidth
+										color="primary"
+										sx={{ mb: 1 }}
+										onClick={() => signIn(provider.id)}
+									>
+										{provider.name}
+									</Button>
+								))}
 						</Grid>
 					</Grid>
 				</Box>
