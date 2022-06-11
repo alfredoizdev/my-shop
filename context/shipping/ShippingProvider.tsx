@@ -3,6 +3,7 @@ import { ShippingContext, shippingReducer } from "./";
 import { IShippingAddress } from "interfaces";
 import { shopApi } from "api";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export interface ShippingState {
 	hasError: boolean;
@@ -25,6 +26,8 @@ export const ShippingProvider: FunctionComponent<Props> = ({ children }) => {
 	);
 
 	useEffect(() => {
+		if (!Cookies.get("token")) return;
+
 		const getAddress = async () => {
 			try {
 				const { data } = await shopApi.get("user/address");

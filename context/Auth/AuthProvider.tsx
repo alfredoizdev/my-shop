@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useReducer } from "react";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -24,27 +25,35 @@ interface Props {}
 export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE);
 	const router = useRouter();
+	const { data, status } = useSession();
 
 	useEffect(() => {
-		const checkToken = async () => {
-			if (!Cookies.get("token")) return;
+		if (status === "authenticated") {
+			console.log(data);
+			dispatch({ type: "[Auth] - login", payload: data?.user as IUser });
+		}
+	}, [status, data]);
 
-			try {
-				const { data } = await shopApi.get<IUserToken>(
-					"user/validate-token"
-				);
-				const { token, user } = data;
-				Cookies.set("token", token!);
-				dispatch({ type: "[Auth] - login", payload: user });
-				return;
-			} catch (error) {
-				Cookies.remove("token");
-				dispatch({ type: "[Auth] - logout" });
-			}
-		};
+	// useEffect(() => {
+	// 	const checkToken = async () => {
+	// 		if (!Cookies.get("token")) return;
 
-		checkToken();
-	}, []);
+	// 		try {
+	// 			const { data } = await shopApi.get<IUserToken>(
+	// 				"user/validate-token"
+	// 			);
+	// 			const { token, user } = data;
+	// 			Cookies.set("token", token!);
+	// 			dispatch({ type: "[Auth] - login", payload: user });
+	// 			return;
+	// 		} catch (error) {
+	// 			Cookies.remove("token");
+	// 			dispatch({ type: "[Auth] - logout" });
+	// 		}
+	// 	};
+
+	// 	checkToken();
+	// }, []);
 
 	const loginUser = async (
 		email: string,
@@ -99,10 +108,9 @@ export const AuthProvider: FunctionComponent<Props> = ({ children }) => {
 	};
 
 	const logout = () => {
-		Cookies.remove("token");
 		Cookies.remove("cart");
-
-		router.reload();
+		dispatch({ type: "[Auth] - logout" });
+		signOut();
 	};
 
 	return (
