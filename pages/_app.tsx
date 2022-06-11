@@ -5,28 +5,31 @@ import { lightTheme } from "themes";
 import { SWRConfig } from "swr";
 import { AuthProvider, CartProvider, UiProvider } from "context";
 import { ShippingProvider } from "context/shipping";
+import { SessionProvider } from "next-auth/react";
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
-		<SWRConfig
-			value={{
-				fetcher: (resource, init) =>
-					fetch(resource, init).then((res) => res.json()),
-			}}
-		>
-			<AuthProvider>
-				<ShippingProvider>
-					<CartProvider>
-						<UiProvider>
-							<ThemeProvider theme={lightTheme}>
-								<CssBaseline />
-								<Component {...pageProps} />
-							</ThemeProvider>
-						</UiProvider>
-					</CartProvider>
-				</ShippingProvider>
-			</AuthProvider>
-		</SWRConfig>
+		<SessionProvider>
+			<SWRConfig
+				value={{
+					fetcher: (resource, init) =>
+						fetch(resource, init).then((res) => res.json()),
+				}}
+			>
+				<AuthProvider>
+					<ShippingProvider>
+						<CartProvider>
+							<UiProvider>
+								<ThemeProvider theme={lightTheme}>
+									<CssBaseline />
+									<Component {...pageProps} />
+								</ThemeProvider>
+							</UiProvider>
+						</CartProvider>
+					</ShippingProvider>
+				</AuthProvider>
+			</SWRConfig>
+		</SessionProvider>
 	);
 }
 

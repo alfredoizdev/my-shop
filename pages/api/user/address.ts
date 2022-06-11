@@ -127,6 +127,7 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 				userById.address = shippingAddress;
 				await userById.save();
 			}
+			await db.disconnect();
 			return res.status(201).json({ address: shippingAddress });
 		}
 	} catch (error) {
