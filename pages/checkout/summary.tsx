@@ -1,10 +1,12 @@
-import { FunctionComponent, useContext } from "react";
+import { FunctionComponent, useContext, useState } from "react";
+import { useRouter } from "next/router";
 import NextLink from "next/link";
 import {
 	Box,
 	Button,
 	Card,
 	CardContent,
+	Chip,
 	Divider,
 	Grid,
 	Link,
@@ -20,14 +22,28 @@ const SummaryPage: FunctionComponent = () => {
 	const { shippingAddress } = useContext(ShippingContext);
 	const { countries } = useContext(UiContext);
 
+	const [isPosting, setIsPosting] = useState(false);
+	const [errorMessage, setErrorMessage] = useState("");
+
+	const router = useRouter();
+
 	const setCountryInAddress = () => {
 		return countries.find(
 			(contry) => contry.code === shippingAddress?.country
 		)?.name;
 	};
 
-	const onCreateOrder = () => {
-		createOrder();
+	const onCreateOrder = async () => {
+		setIsPosting(true);
+
+		const { hasError, message } = await createOrder();
+		if (hasError) {
+			setIsPosting(false);
+			setErrorMessage(message);
+			return;
+		}
+
+		router.replace(`/orders/${message}`);
 	};
 
 	if (!shippingAddress) {
@@ -84,8 +100,9 @@ const SummaryPage: FunctionComponent = () => {
 							</Box>
 
 							<OrderSummary />
-							<Box sx={{ mt: 3 }}>
+							<Box sx={{ mt: 3 }} display="flex" flexDirection="column">
 								<Button
+									disabled={isPosting}
 									color="secondary"
 									className="circular-btn"
 									fullWidth
@@ -93,6 +110,14 @@ const SummaryPage: FunctionComponent = () => {
 								>
 									Confirm your order
 								</Button>
+								<Chip
+									color="error"
+									label={errorMessage}
+									sx={{
+										display: errorMessage ? "flex" : "none",
+										mt: 1,
+									}}
+								/>
 							</Box>
 						</CardContent>
 					</Card>
