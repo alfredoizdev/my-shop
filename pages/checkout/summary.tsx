@@ -16,7 +16,7 @@ import ShopLayout from "components/layouts/ShopLayout";
 import { CartContext, ShippingContext, UiContext } from "context";
 
 const SummaryPage: FunctionComponent = () => {
-	const { numberOfItems } = useContext(CartContext);
+	const { numberOfItems, createOrder } = useContext(CartContext);
 	const { shippingAddress } = useContext(ShippingContext);
 	const { countries } = useContext(UiContext);
 
@@ -24,6 +24,10 @@ const SummaryPage: FunctionComponent = () => {
 		return countries.find(
 			(contry) => contry.code === shippingAddress?.country
 		)?.name;
+	};
+
+	const onCreateOrder = () => {
+		createOrder();
 	};
 
 	if (!shippingAddress) {
@@ -85,6 +89,7 @@ const SummaryPage: FunctionComponent = () => {
 									color="secondary"
 									className="circular-btn"
 									fullWidth
+									onClick={onCreateOrder}
 								>
 									Confirm your order
 								</Button>

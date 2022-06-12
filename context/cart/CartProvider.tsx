@@ -1,7 +1,8 @@
 import { FunctionComponent, useEffect, useReducer } from "react";
-import { ICartProduct, IShippingAddress } from "interfaces";
+import { ICartProduct, IShippingAddress, IOrder } from "interfaces";
 import { CartContext, cartReducer } from "./";
 import Cookies from "js-cookie";
+import { shopApi } from "api";
 
 export interface CartState {
 	isLoaded: boolean;
@@ -46,26 +47,6 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 			});
 		}
 	}, []);
-
-	// useEffect(() => {
-	// 	if (Cookies.get("firstname")) {
-	// 		const address: IShippingAddress = {
-	// 			firstname: Cookies.get("firtsname") || "",
-	// 			lastname: Cookies.get("lastname") || "",
-	// 			address: Cookies.get("address") || "",
-	// 			address2: Cookies.get("address2") || "",
-	// 			zip: Cookies.get("zip") || "",
-	// 			city: Cookies.get("city") || "",
-	// 			country: Cookies.get("country") || "",
-	// 			phone: Cookies.get("phone") || "",
-	// 		};
-
-	// 		dispatch({
-	// 			type: "[Cart] - Load address from cookies",
-	// 			payload: address,
-	// 		});
-	// 	}
-	// }, []);
 
 	useEffect(() => {
 		Cookies.set("cart", JSON.stringify(state.cart));
@@ -141,17 +122,32 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 		dispatch({ type: "[Cart] - Change quantity product", payload: product });
 	};
 
-	// const updateAddress = (data: IShippingAddress) => {
-	// 	Cookies.set("firtsname", data.firstname);
-	// 	Cookies.set("lastname", data.lastname);
-	// 	Cookies.set("address", data.address);
-	// 	Cookies.set("address2", data.address2 || "");
-	// 	Cookies.set("zip", data.zip);
-	// 	Cookies.set("city", data.city);
-	// 	Cookies.set("country", data.country);
-	// 	Cookies.set("phone", data.phone);
-	// 	dispatch({ type: "[Cart] - Update address", payload: data });
-	// };
+	const createOrder = async () => {
+		console.log(state.numberOfItems);
+		try {
+			const { data: shipping } = await shopApi.get("user/address");
+
+			if (!shipping) throw Error("Is not a shipping address");
+
+			const body: IOrder = {
+				orderItems: state.cart.map((product) => ({
+					...product,
+					size: product.size!,
+				})),
+				shippingAddress: shipping.address,
+				numberOfItems: state?.numberOfItems,
+				subTotal: state.subTotal,
+				tax: state.tax,
+				total: state.total,
+				isPaid: false,
+			};
+
+			const { data } = await shopApi.post<IOrder>("/orders", body);
+			console.log(data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	return (
 		<CartContext.Provider
@@ -160,7 +156,7 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 				addProductToCart,
 				updateCartQuantity,
 				removedCartProduct,
-				//updateAddress,
+				createOrder,
 			}}
 		>
 			{children}

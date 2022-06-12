@@ -1,23 +1,25 @@
 import { IUser } from "./user";
 import { IShippingAddress } from "./shippingAddress";
+import { IValidSizes } from "./products";
+
 export interface IOrder {
 	_id?: string;
 	user?: IUser | string;
 	orderItems: IOrderItem[];
 	shippingAddress: IShippingAddress;
 	paymentResult?: string;
-	numberOfIttem: number;
+	numberOfItems: number;
 	subTotal: number;
 	total: number;
-	taxt: number;
+	tax: number;
 	isPaid: boolean;
-	paidAt: string;
+	paidAt?: string;
 }
 
 export interface IOrderItem {
 	_id: string;
 	title: string;
-	size: string;
+	size: IValidSizes;
 	quantity: number;
 	slug: string;
 	image: string;
