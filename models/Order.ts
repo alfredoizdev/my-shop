@@ -17,6 +17,7 @@ const orderSchema = new Schema(
 				slug: { type: String, required: true },
 				image: { type: String, required: true },
 				price: { type: String, required: true },
+				gender: { type: String },
 			},
 		],
 		shippingAddress: {
@@ -30,7 +31,7 @@ const orderSchema = new Schema(
 			phone: { type: String, require: true },
 			userId: { type: String, required: true },
 		},
-		numberOfItem: { type: Number, required: true },
+		numberOfItems: { type: Number, required: true },
 		subTotal: { type: Number, required: true },
 		tax: { type: Number, required: true },
 		total: { type: Number, required: true },
@@ -43,6 +44,6 @@ const orderSchema = new Schema(
 );
 
 const Order: Model<IOrder> =
-	mongoose.models.User || model("Order", orderSchema);
+	mongoose.models.Order || model("Order", orderSchema);
 
 export default Order;
