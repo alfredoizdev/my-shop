@@ -3,6 +3,7 @@ import { ICartProduct, IShippingAddress, IOrder } from "interfaces";
 import { CartContext, cartReducer } from "./";
 import Cookies from "js-cookie";
 import { shopApi } from "api";
+import axios, { AxiosError } from "axios";
 
 export interface CartState {
 	isLoaded: boolean;
@@ -122,7 +123,10 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 		dispatch({ type: "[Cart] - Change quantity product", payload: product });
 	};
 
-	const createOrder = async () => {
+	const createOrder = async (): Promise<{
+		hasError: boolean;
+		message: string;
+	}> => {
 		console.log(state.numberOfItems);
 		try {
 			const { data: shipping } = await shopApi.get("user/address");
@@ -143,9 +147,26 @@ export const CartProvider: FunctionComponent<Props> = ({ children }) => {
 			};
 
 			const { data } = await shopApi.post<IOrder>("/orders", body);
-			console.log(data);
+
+			dispatch({ type: "[Cart] - Order completed" });
+
+			return {
+				hasError: false,
+				message: data._id!,
+			};
 		} catch (error) {
-			console.log(error);
+			if (axios.isAxiosError(error)) {
+				return {
+					hasError: true,
+					// @ts-ignore
+					message: error.response?.data.message,
+				};
+			}
+
+			return {
+				hasError: true,
+				message: "unhandle error please contatc with the admin",
+			};
 		}
 	};
 

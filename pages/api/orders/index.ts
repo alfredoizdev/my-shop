@@ -24,31 +24,32 @@ export default function handler(
 }
 
 const createOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-	const { orderItems, total, numberOfItems } = req.body as IOrder;
-	console.log(numberOfItems);
+	const { orderItems, total } = req.body as IOrder;
 
+	// verify is user are login
 	const session: any = await getSession({ req });
 
 	if (!session) {
 		return res.status(401).json({ message: "User need being authenticated" });
 	}
 
+	// create array with the product select by the user
 	const productIds: string[] = orderItems.map((product) => product._id);
 	await db.connect();
-
+	// encuentra todos los productos que exitan en (productIds array string)
 	const dbProducts = await Product.find({ _id: { $in: productIds } });
 
 	try {
 		const subTotal = orderItems.reduce((prev, current) => {
 			const currentPrice = dbProducts.find(
-				(prod) => prod.id === current._id
+				(prod) => prod._id.toString() === current._id
 			)?.price;
 
 			if (!currentPrice) {
 				throw new Error("Verify the cart product is incorrect ");
 			}
 
-			return current.quantity * currentPrice + prev;
+			return currentPrice * current.quantity + prev;
 		}, 0);
 
 		const taxRate = Number(process.env.NEXT_PUBLIC_TAX_RATE || 0);
@@ -69,7 +70,9 @@ const createOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 			isPaid: false,
 			user: userId,
 		});
+
 		await newOrder.save();
+		await db.disconnect();
 		return res.status(201).json(newOrder);
 	} catch (error: any) {
 		await db.disconnect();
