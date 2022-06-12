@@ -87,7 +87,10 @@ const SideMenu: FC = () => {
 								<ListItemIcon>
 									<ConfirmationNumberOutlined />
 								</ListItemIcon>
-								<ListItemText primary={"My Ordenes"} />
+								<ListItemText
+									primary={"My Ordenes"}
+									onClick={() => navigationTo("/orders/history")}
+								/>
 							</ListItem>
 						</>
 					)}
