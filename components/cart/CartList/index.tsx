@@ -12,12 +12,17 @@ import {
 import ItemCounter from "components/ui/ItemCounter";
 import { CartContext } from "context/cart/CartContext";
 import { ICartProduct } from "interfaces/cart";
+import { IOrderItem } from "interfaces";
 
 interface Props {
 	editabled?: boolean;
+	products?: IOrderItem[];
 }
 
-const CartList: FunctionComponent<Props> = ({ editabled = false }) => {
+const CartList: FunctionComponent<Props> = ({
+	editabled = false,
+	products,
+}) => {
 	const { cart, updateCartQuantity, removedCartProduct } =
 		useContext(CartContext);
 
@@ -29,9 +34,11 @@ const CartList: FunctionComponent<Props> = ({ editabled = false }) => {
 		updateCartQuantity(product);
 	};
 
+	const productToShow = products ? products : cart;
+
 	return (
 		<>
-			{cart.map((product) => (
+			{productToShow.map((product) => (
 				<Grid
 					container
 					spacing={2}
@@ -64,7 +71,10 @@ const CartList: FunctionComponent<Props> = ({ editabled = false }) => {
 									currentValue={product.quantity}
 									maxValue={10}
 									updatedQuantity={(newQty) =>
-										onNewProductQuantityValue(product, newQty)
+										onNewProductQuantityValue(
+											product as ICartProduct,
+											newQty
+										)
 									}
 								/>
 							) : (
@@ -88,7 +98,9 @@ const CartList: FunctionComponent<Props> = ({ editabled = false }) => {
 							<Button
 								variant="text"
 								color="secondary"
-								onClick={() => removedCartProduct(product)}
+								onClick={() =>
+									removedCartProduct(product as ICartProduct)
+								}
 							>
 								Remove
 							</Button>
