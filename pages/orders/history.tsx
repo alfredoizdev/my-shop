@@ -20,9 +20,9 @@ const columns: GridColDef[] = [
 		width: 200,
 		renderCell: (params: GridValueGetterParams) => {
 			return params.row.paid ? (
-				<Chip color="success" label="Pagada" variant="outlined" />
+				<Chip color="success" label="Pay off" variant="outlined" />
 			) : (
-				<Chip color="error" label="No pagada" variant="outlined" />
+				<Chip color="error" label="Pedding to pay" variant="outlined" />
 			);
 		},
 	},

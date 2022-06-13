@@ -70,6 +70,8 @@ const createOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 			isPaid: false,
 			user: userId,
 		});
+		// remover decimales solo dejas dos (exp 700.00)
+		newOrder.total = Math.round(newOrder.total * 100) / 100;
 
 		await newOrder.save();
 		await db.disconnect();
