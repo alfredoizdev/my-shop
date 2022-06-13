@@ -2,7 +2,9 @@ import axios from "axios";
 import { db } from "database";
 import { IPaypal } from "interfaces";
 import { Order } from "models";
+import mongoose from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getSession } from "next-auth/react";
 
 type Data = {
 	message: string;
@@ -56,8 +58,21 @@ const getPaypalBearerToken = async (): Promise<string | null> => {
 };
 
 const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-	// TODO validate user session
-	// TODO validate mongo id
+	//  validate user session
+	const { transactionId = "", orderId = "" } = req.body;
+	const session = await getSession({ req });
+	if (!session) {
+		return res.status(401).json({
+			message: "You need has session login to completed this order",
+		});
+	}
+
+	//  validate mongo id
+	if (!mongoose.isValidObjectId(orderId)) {
+		return res.status(400).json({
+			message: "Is not a valid order",
+		});
+	}
 	const paypalBearerToken = await getPaypalBearerToken();
 
 	if (!paypalBearerToken) {
@@ -65,8 +80,6 @@ const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 			.status(400)
 			.json({ message: "Can't confirm the paypal token" });
 	}
-
-	const { transactionId = "", orderId = "" } = req.body;
 
 	const { data } = await axios.get<IPaypal.PaypalOrderStatusResponse>(
 		`${process.env.PAYPAL_ORDERS_URL}/${transactionId}`,
