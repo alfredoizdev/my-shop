@@ -21,7 +21,7 @@ const OrderSummary: FunctionComponent<Props> = ({ ordersSummary }) => {
 		: { numberOfItems, subTotal, total, tax };
 
 	return (
-		<Grid container>
+		<Grid container className="fadeIn">
 			<Grid item xs={6}>
 				<Typography>
 					Number of{" "}
