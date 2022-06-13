@@ -42,7 +42,7 @@ const Slug: NextPage<Props> = ({ product }) => {
 		if (!tempCartProduct.size) return;
 		//console.log(tempCartProduct);
 		addProductToCart(tempCartProduct);
-		//router.push("/cart");
+		router.replace("/cart");
 	};
 
 	return (

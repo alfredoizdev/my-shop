@@ -1,15 +1,16 @@
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { GetServerSideProps } from "next";
-import NextLink from "next/link";
+import { PayPalButtons } from "@paypal/react-paypal-js";
+
 import {
 	Box,
-	Button,
 	Card,
 	CardContent,
 	Chip,
+	CircularProgress,
 	Divider,
 	Grid,
-	Link,
 	Typography,
 } from "@mui/material";
 import CartList from "components/cart/CartList";
@@ -21,14 +22,53 @@ import {
 } from "@mui/icons-material";
 import { getSession } from "next-auth/react";
 import { dbOrders } from "database";
-import { IOrder } from "interfaces";
+import { IOrder, IPaypal } from "interfaces";
+import { shopApi } from "api";
+import { useRouter } from "next/router";
+import FullScreenLoading from "components/ui/FullScreenLoading";
 
 interface Props {
 	order: IOrder;
 }
 
 const OrderPage: NextPage<Props> = ({ order }) => {
+	const [isPayAlredy, setIsPayAlreday] = useState(false);
+	const [isPaying, setIspaying] = useState(false);
+	const [showLoading, setShowLoading] = useState(false);
 	const { shippingAddress } = order;
+
+	useEffect(() => {
+		if (order) {
+			setIsPayAlreday(order.isPaid);
+			setShowLoading(true);
+		} else {
+			setShowLoading(false);
+		}
+	}, [order]);
+
+	const onOrderCompleted = async (details: IPaypal.OrderResponseBody) => {
+		if (details.status !== "COMPLETED") {
+			return alert("Is not pay in paypal");
+		}
+		setIspaying(true);
+
+		try {
+			const { data } = await shopApi.post(`/orders/pay`, {
+				transactionId: details.id,
+				orderId: order._id,
+			});
+			setIspaying(false);
+			setIsPayAlreday(true);
+		} catch (error) {
+			setIspaying(false);
+			console.log(error);
+		}
+	};
+
+	if (showLoading) {
+		<FullScreenLoading />;
+	}
+
 	return (
 		<ShopLayout
 			title="Resume of order 1234567"
@@ -37,7 +77,7 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 			<Typography variant="h1" component="h1" sx={{ my: 2 }}>
 				Order: {order._id}
 			</Typography>
-			{order.isPaid ? (
+			{isPayAlredy ? (
 				<Chip
 					sx={{ my: 2 }}
 					label="Payoff"
@@ -55,7 +95,7 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 				/>
 			)}
 
-			<Grid container>
+			<Grid container className="fadeIn">
 				<Grid item xs={12} sm={7}>
 					<CartList products={order.orderItems} />
 				</Grid>
@@ -99,8 +139,17 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 
 							<Box sx={{ mt: 3 }} display="flex" flexDirection="column">
 								{/* TODO */}
+								{isPaying && (
+									<Box
+										display="flex"
+										justifyContent="center"
+										className="fadeIn"
+									>
+										<CircularProgress />
+									</Box>
+								)}
 
-								{order.isPaid ? (
+								{isPayAlredy ? (
 									<Chip
 										sx={{ my: 2 }}
 										label="Payoff"
@@ -109,7 +158,30 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 										icon={<CreditScoreOutlined />}
 									/>
 								) : (
-									<h2>Pay</h2>
+									<>
+										{!isPaying && (
+											<PayPalButtons
+												createOrder={(data, actions) => {
+													return actions.order.create({
+														purchase_units: [
+															{
+																amount: {
+																	value: `${order.total}`,
+																},
+															},
+														],
+													});
+												}}
+												onApprove={(data, actions) => {
+													return actions
+														.order!.capture()
+														.then((details) => {
+															onOrderCompleted(details);
+														});
+												}}
+											/>
+										)}
+									</>
 								)}
 							</Box>
 						</CardContent>
