@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 import { db, seedDatabase } from "database";
-import { Product, User, Country } from "models";
+import { Product, User, Country, Order } from "models";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -17,6 +17,8 @@ export default async function handler(
 
 	await User.deleteMany();
 	await User.insertMany(seedDatabase.initialData.users);
+
+	await Order.deleteMany();
 
 	await Product.deleteMany();
 	await Product.insertMany(seedDatabase.initialData.products);
