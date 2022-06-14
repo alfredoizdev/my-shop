@@ -150,8 +150,6 @@ const getAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 	);
 	await db.disconnect();
 
-	console.log("HERE", shippingAddress);
-
 	if (shippingAddress?.address) {
 		const { address } = shippingAddress;
 		return res.status(200).json({ address });

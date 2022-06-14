@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest, ev: NextFetchEvent) {
 		});
 	}
 
-	const validRoles = ["admin", "super-user", "ceo"];
+	const validRoles = ["admin", "super-user", "SEO"];
 
 	if (!validRoles.includes(session.user.role)) {
 		return new Response(JSON.stringify({ message: "Not authorized" }), {
