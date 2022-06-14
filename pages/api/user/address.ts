@@ -4,6 +4,7 @@ import { IShippingAddress } from "interfaces/shippingAddress";
 import { User } from "models";
 import { db } from "database";
 import Address from "models/Address";
+import { getSession } from "next-auth/react";
 
 type Data =
 	| {
@@ -29,7 +30,12 @@ export default function handler(
 }
 
 const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-	const { token = "" } = req.cookies;
+	const session: any = await getSession({ req });
+
+	if (!session) {
+		return res.status(401).json({ message: "User not found is not login" });
+	}
+
 	const {
 		address = "",
 		address2 = "",
@@ -84,18 +90,12 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 		return res.status(400).json({ message: "the City must no be empty" });
 	}
 
-	let userId = "";
-
-	try {
-		userId = await jwt.isValidToken(token);
-	} catch (error) {
-		return res.status(401).json({ message: "Token are no valid" });
-	}
-
 	try {
 		await db.connect();
 
-		const addressOnFile = await Address.findOne({ userId }).limit(1);
+		const addressOnFile = await Address.findOne({
+			userId: session.user._id,
+		}).limit(1);
 		if (addressOnFile) {
 			addressOnFile.address = address;
 			addressOnFile.address2 = address2;
@@ -118,10 +118,10 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 				country,
 				phone,
 				city,
-				userId,
+				userId: session.user._id,
 			});
 			await shippingAddress.save();
-			const userById = await User.findById(userId);
+			const userById = await User.findById(session.user._id);
 
 			if (userById) {
 				userById.address = shippingAddress;
@@ -138,16 +138,19 @@ const saveAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 };
 
 const getAddress = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-	const { token = "" } = req.cookies;
-	let userId = "";
-	try {
-		userId = await jwt.isValidToken(token);
-	} catch (error) {
-		return res.status(401).json({ message: "Token are no valid" });
+	const session: any = await getSession({ req });
+
+	if (!session) {
+		return res.status(401).json({ message: "User not found is not login" });
 	}
+
 	await db.connect();
-	const shippingAddress = await User.findById(userId).populate("address");
+	const shippingAddress = await User.findById(session.user._id).populate(
+		"address"
+	);
 	await db.disconnect();
+
+	console.log("HERE", shippingAddress);
 
 	if (shippingAddress?.address) {
 		const { address } = shippingAddress;
