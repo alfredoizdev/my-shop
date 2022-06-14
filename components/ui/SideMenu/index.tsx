@@ -173,14 +173,20 @@ const SideMenu: FC = () => {
 								<ListItemIcon>
 									<ConfirmationNumberOutlined />
 								</ListItemIcon>
-								<ListItemText primary={"Ordens"} />
+								<ListItemText
+									primary={"Ordens"}
+									onClick={() => navigationTo(`/admin/orders`)}
+								/>
 							</ListItem>
 
 							<ListItem button>
 								<ListItemIcon>
 									<AdminPanelSettings />
 								</ListItemIcon>
-								<ListItemText primary={"Users"} />
+								<ListItemText
+									primary={"Users"}
+									onClick={() => navigationTo(`/admin/users`)}
+								/>
 							</ListItem>
 						</>
 					)}
