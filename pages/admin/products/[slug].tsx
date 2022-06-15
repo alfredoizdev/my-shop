@@ -128,6 +128,8 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 		);
 	};
 
+	console.log(getValues("images"), product);
+
 	const onFileSelected = async ({ target }: ChangeEvent<HTMLInputElement>) => {
 		if (!target.files || target.files.length === 0) {
 			return;
@@ -402,29 +404,31 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 								}}
 							/>
 
-							<Grid container spacing={2}>
-								{getValues("images").map((img) => (
-									<Grid item xs={4} sm={3} key={img}>
-										<Card sx={{ mt: 3 }}>
-											<CardMedia
-												component="img"
-												className="fadeIn"
-												image={img}
-												alt={img}
-											/>
-											<CardActions>
-												<Button
-													fullWidth
-													color="error"
-													onClick={() => onDeletedImage(img)}
-												>
-													Borrar
-												</Button>
-											</CardActions>
-										</Card>
-									</Grid>
-								))}
-							</Grid>
+							{getValues("images") && (
+								<Grid container spacing={2}>
+									{getValues("images").map((img) => (
+										<Grid item xs={4} sm={3} key={img}>
+											<Card sx={{ mt: 3 }}>
+												<CardMedia
+													component="img"
+													className="fadeIn"
+													image={img}
+													alt={img}
+												/>
+												<CardActions>
+													<Button
+														fullWidth
+														color="error"
+														onClick={() => onDeletedImage(img)}
+													>
+														Borrar
+													</Button>
+												</CardActions>
+											</Card>
+										</Grid>
+									))}
+								</Grid>
+							)}
 						</Box>
 					</Grid>
 				</Grid>
@@ -445,7 +449,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 		// crear
 		const tempProduct = JSON.parse(JSON.stringify(new Product()));
 		delete tempProduct._id;
-		tempProduct.images = ["img1.jpg", "img.jpg"];
+		tempProduct.images = [];
 		product = tempProduct;
 	} else {
 		product = await dbProducts.getProductBySlug(slug.toString());
