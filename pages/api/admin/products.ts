@@ -4,6 +4,10 @@ import { Product } from "models";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { isValidObjectId } from "mongoose";
 
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config(process.env.CLOUDINARY_URL || "");
+
 type Data =
 	| {
 			message: string;
@@ -29,11 +33,21 @@ export default function handler(
 
 const getProduct = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 	await db.connect();
-	const product = await Product.find().sort({ title: "asc" }).lean();
+	const products = await Product.find().sort({ title: "asc" }).lean();
 	await db.disconnect();
 	// TODO:
 	// Tedremos que actualizar las imagenes
-	return res.status(200).json(product);
+	const updatedProduct = products.map((product) => {
+		product.images = product.images.map((image) => {
+			return image.includes("http")
+				? image
+				: `${process.env.HOST_NAME}products/${image}`;
+		});
+
+		return product;
+	});
+
+	return res.status(200).json(updatedProduct);
 };
 const updatedProduct = async (
 	req: NextApiRequest,
@@ -64,6 +78,20 @@ const updatedProduct = async (
 		}
 
 		//TODO: eliminar fotos en Cloudinary
+		//https://res.cloudinary.com/dujqbnxyg/image/upload/v1655306876/ctyidkefduiuh3cf2gz2.webp
+
+		product.images.forEach(async (image) => {
+			// si alguna imagen que esta en el producto no viene el req.bodi images
+			// entonces delete
+			if (!images.includes(image)) {
+				// delete cloudinary
+				// hago un split para obtnere el id en url
+				const [fiedlId, ext] = image
+					.substring(image.lastIndexOf("/") + 1)
+					.split(".");
+				await cloudinary.uploader.destroy(fiedlId);
+			}
+		});
 
 		await product.update(req.body);
 		await db.disconnect();
