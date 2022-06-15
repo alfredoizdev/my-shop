@@ -24,14 +24,13 @@ import {
 	FormGroup,
 	FormLabel,
 	Grid,
-	ListItem,
-	Paper,
 	Radio,
 	RadioGroup,
 	TextField,
 } from "@mui/material";
 import AdminLayout from "components/layouts/AdminLayout";
 import {} from "react";
+import { shopApi } from "api";
 
 const validTypes = ["shirts", "pants", "hoodies", "hats"];
 const validGender = ["men", "women", "kid", "unisex"];
@@ -57,6 +56,7 @@ interface Props {
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
 	const [newTagValue, setNewTagValue] = useState("");
+	const [isSaving, setISseving] = useState(false);
 	const {
 		register,
 		handleSubmit,
@@ -115,7 +115,28 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 		setValue("tags", updatedTags, { shouldValidate: true });
 	};
 
-	const onSubmit = (form: FormData) => {};
+	const onSubmit = async (form: FormData) => {
+		setISseving(true);
+		if (form.images.length < 2) {
+			return alert("Images need less 2");
+		}
+
+		try {
+			const { data } = await shopApi({
+				url: "/admin/products",
+				method: "PUT",
+				data: form,
+			});
+			if (!form._id) {
+				// TODO
+			} else {
+				setISseving(false);
+			}
+		} catch (error) {
+			setISseving(false);
+			console.log(error);
+		}
+	};
 
 	return (
 		<AdminLayout
@@ -130,8 +151,9 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 						startIcon={<SaveOutlined />}
 						sx={{ width: "150px" }}
 						type="submit"
+						disabled={isSaving}
 					>
-						Guardar
+						Save
 					</Button>
 				</Box>
 
