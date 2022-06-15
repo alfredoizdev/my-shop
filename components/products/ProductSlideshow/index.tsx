@@ -7,15 +7,15 @@ interface ProductSlideshowProps {
 }
 
 const ProductSlideshow: FC<ProductSlideshowProps> = ({ images }) => {
+	console.log(images);
 	return (
 		<Slide easing="ease" duration={7000} indicators>
 			{images.map((img) => {
-				const url = `/products/${img}`;
 				return (
 					<div className={styles.eachSlide} key={img}>
 						<div
 							style={{
-								backgroundImage: `url(${url})`,
+								backgroundImage: `url(${img})`,
 								backgroundSize: "cover",
 							}}
 						></div>

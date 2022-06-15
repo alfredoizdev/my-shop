@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 
@@ -59,6 +59,7 @@ interface Props {
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
 	const router = useRouter();
+	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [newTagValue, setNewTagValue] = useState("");
 	const [isSaving, setISseving] = useState(false);
 	const {
@@ -117,6 +118,36 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 	const onDeleteTag = (tag: string) => {
 		const updatedTags = getValues("tags").filter((t) => t !== tag);
 		setValue("tags", updatedTags, { shouldValidate: true });
+	};
+
+	const onDeletedImage = (image: string) => {
+		setValue(
+			"images",
+			getValues("images").filter((img) => img !== image),
+			{ shouldValidate: true }
+		);
+	};
+
+	const onFileSelected = async ({ target }: ChangeEvent<HTMLInputElement>) => {
+		if (!target.files || target.files.length === 0) {
+			return;
+		}
+
+		try {
+			for (const file of target.files) {
+				const formDate = new FormData();
+				formDate.append("file", file);
+				const { data } = await shopApi.post<{ message: string }>(
+					"/admin/upload",
+					formDate
+				);
+				setValue("images", [...getValues("images"), data.message], {
+					shouldValidate: true,
+				});
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const onSubmit = async (form: FormData) => {
@@ -349,28 +380,44 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 								fullWidth
 								startIcon={<UploadOutlined />}
 								sx={{ mb: 3 }}
+								onClick={() => fileInputRef.current?.click()}
 							>
 								Upload images
 							</Button>
-
+							<input
+								ref={fileInputRef}
+								type="file"
+								multiple
+								accept="image/png, image/gif, image/jpeg"
+								style={{ display: "none" }}
+								onChange={onFileSelected}
+							/>
 							<Chip
 								label="Need less 2 images"
 								color="error"
 								variant="outlined"
+								sx={{
+									display:
+										getValues("images").length < 2 ? "flex" : "none",
+								}}
 							/>
 
 							<Grid container spacing={2}>
-								{product.images.map((img) => (
+								{getValues("images").map((img) => (
 									<Grid item xs={4} sm={3} key={img}>
-										<Card>
+										<Card sx={{ mt: 3 }}>
 											<CardMedia
 												component="img"
 												className="fadeIn"
-												image={`/products/${img}`}
+												image={img}
 												alt={img}
 											/>
 											<CardActions>
-												<Button fullWidth color="error">
+												<Button
+													fullWidth
+													color="error"
+													onClick={() => onDeletedImage(img)}
+												>
 													Borrar
 												</Button>
 											</CardActions>

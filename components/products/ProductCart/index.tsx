@@ -20,9 +20,7 @@ const ProductCart: FC<ProducCardProps> = ({ product }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isImageLoading, seIsImagenLoading] = useState(false);
 	const productImage = useMemo(() => {
-		return isHovered
-			? `/products/${product.images[1]}`
-			: `/products/${product.images[0]}`;
+		return isHovered ? product.images[1] : product.images[0];
 	}, [isHovered, product.images]);
 
 	return (
