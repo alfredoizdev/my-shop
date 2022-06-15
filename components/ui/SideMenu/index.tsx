@@ -167,7 +167,10 @@ const SideMenu: FC = () => {
 								<ListItemIcon>
 									<CategoryOutlined />
 								</ListItemIcon>
-								<ListItemText primary={"Product"} />
+								<ListItemText
+									primary={"Product"}
+									onClick={() => navigationTo(`/admin/products`)}
+								/>
 							</ListItem>
 							<ListItem button>
 								<ListItemIcon>
