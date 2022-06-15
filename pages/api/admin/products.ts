@@ -21,7 +21,7 @@ export default function handler(
 		case "PUT":
 			return updatedProduct(req, res);
 		case "POST":
-			return res.status(400).json({ message: "Bad request" });
+			return createdProduct(req, res);
 		default:
 			return res.status(400).json({ message: "Bad request" });
 	}
@@ -46,7 +46,7 @@ const updatedProduct = async (
 	}
 
 	if (images.length < 2) {
-		return res.status(400).json({ message: "Need less tow images" });
+		return res.status(400).json({ message: "Need less two images" });
 	}
 
 	//TODO: posiblemente tendremos localhost:3000/products/image.jpg
@@ -74,4 +74,38 @@ const updatedProduct = async (
 		await db.disconnect();
 		return res.status(500).json({ message: "Server error check logs" });
 	}
+};
+const createdProduct = async (
+	req: NextApiRequest,
+	res: NextApiResponse<Data>
+) => {
+	const { images = [] } = req.body as IProduct;
+
+	if (images.length < 2) {
+		return res.status(400).json({ message: "Need less two images" });
+	}
+
+	try {
+		await db.connect();
+		const productInDB = await Product.findOne({ slug: req.body.slug });
+
+		if (productInDB) {
+			await db.disconnect();
+			return res
+				.status(400)
+				.json({ message: "Is a product with this slugs already" });
+		}
+
+		const product = new Product(req.body);
+		await product.save();
+		await db.disconnect();
+
+		return res.status(201).json(product);
+	} catch (error) {
+		console.log(error);
+		await db.disconnect();
+		return res.status(500).json({ message: "Server error check logs" });
+	}
+
+	//TODO: posiblemente tendremos localhost:3000/products/image.jpg
 };

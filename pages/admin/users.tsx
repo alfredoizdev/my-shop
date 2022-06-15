@@ -112,9 +112,11 @@ const UsersPage: NextPage<Props> = ({ currentUserId }) => {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 	const session: any = await getSession({ req });
 
+	console.log(session);
+
 	return {
 		props: {
-			currentUserId: session.user._id,
+			currentUserId: session?.user._id || null,
 		},
 	};
 };
