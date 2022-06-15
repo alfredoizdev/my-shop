@@ -1,5 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+
 import { useForm } from "react-hook-form";
 
 import { IProduct } from "interfaces";
@@ -31,6 +33,7 @@ import {
 import AdminLayout from "components/layouts/AdminLayout";
 import {} from "react";
 import { shopApi } from "api";
+import { Product } from "models";
 
 const validTypes = ["shirts", "pants", "hoodies", "hats"];
 const validGender = ["men", "women", "kid", "unisex"];
@@ -55,6 +58,7 @@ interface Props {
 }
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
+	const router = useRouter();
 	const [newTagValue, setNewTagValue] = useState("");
 	const [isSaving, setISseving] = useState(false);
 	const {
@@ -124,11 +128,11 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 		try {
 			const { data } = await shopApi({
 				url: "/admin/products",
-				method: "PUT",
+				method: form._id ? "PUT" : "POST", // we we have id is a updated is not is create
 				data: form,
 			});
 			if (!form._id) {
-				// TODO
+				router.replace(`/admin/products/${data.slug}`);
 			} else {
 				setISseving(false);
 			}
@@ -388,7 +392,17 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 	const { slug = "" } = query;
 
-	const product = await dbProducts.getProductBySlug(slug.toString());
+	let product: IProduct | null;
+
+	if (slug === "new") {
+		// crear
+		const tempProduct = JSON.parse(JSON.stringify(new Product()));
+		delete tempProduct._id;
+		tempProduct.images = ["img1.jpg", "img.jpg"];
+		product = tempProduct;
+	} else {
+		product = await dbProducts.getProductBySlug(slug.toString());
+	}
 
 	if (!product) {
 		return {

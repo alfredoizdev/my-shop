@@ -6,6 +6,7 @@ const productSchema = new Schema(
 		description: {
 			type: String,
 			required: true,
+			default: "",
 		},
 		images: [
 			{
@@ -25,18 +26,20 @@ const productSchema = new Schema(
 		],
 		slug: { type: String, required: true, unique: true },
 		tags: [{ type: String }],
-		title: { type: String, required: true },
+		title: { type: String, required: true, default: "" },
 		type: {
 			type: String,
 			enum: {
 				values: ["shirts", "pants", "hoodies", "hats"],
 				message: "{VALUE} is not allowed type",
 			},
+			default: "shirts",
 		},
 		gender: {
 			type: String,
 			enum: ["men", "women", "kid", "unisex"],
 			message: "{VALUE} is not allowed gender",
+			default: "women",
 		},
 	},
 	{
