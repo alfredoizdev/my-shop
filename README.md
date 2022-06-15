@@ -34,3 +34,9 @@ call
 ```
 http://locahos:3000/api/seed
 ```
+
+## demo of this app
+
+```
+https://myshop-next.herokuapp.com/
+```
