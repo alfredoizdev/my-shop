@@ -13,6 +13,9 @@ export const getProductBySlug = async (
 		return null;
 	}
 
+	//TODO
+	// prosesamiento con las imagenes
+
 	return JSON.parse(JSON.stringify(product));
 };
 
