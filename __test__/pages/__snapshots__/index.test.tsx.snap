@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders a header text: 
-		<h1>My Shop</h1>
-	 1`] = `
+exports[`Home page sould render the h1 My shop: 
+			<h1>My Shop</h1>
+		 1`] = `
 <nav>
   <header
     class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionFixed mui-fixed css-11b3ww9-MuiPaper-root-MuiAppBar-root"
