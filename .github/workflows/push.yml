@@ -9,6 +9,9 @@ jobs:
            uses: actions/setup-node@v3
            with:
               node-version: "12.x"
+         - name: Install dependencies
+           run: npm install
+         - name: Run ci test
          - run: npm test
    pull-request:
       runs-on: ubuntu-latest
