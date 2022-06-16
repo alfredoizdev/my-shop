@@ -1,15 +1,15 @@
 on: push
 jobs:
    build:
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
       steps:
-        - uses: actions/checkout@v3
-        - name: Use Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: '12.x'
-        - run: npm test:ci
+         - uses: actions/checkout@v3
+         - name: Use Node.js
+           uses: actions/setup-node@v3
+           with:
+              node-version: "12.x"
+         - run: npm test:ci
    pull-request:
       runs-on: ubuntu-latest
       steps:
