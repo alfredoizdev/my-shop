@@ -1,8 +1,4 @@
-on:
-   push:
-      branches:
-         - myshop/*
-
+on: push
 jobs:
    pull-request:
       runs-on: ubuntu-latest

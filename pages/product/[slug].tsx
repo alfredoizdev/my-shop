@@ -40,7 +40,6 @@ const Slug: NextPage<Props> = ({ product }) => {
 
 	const onAddProduct = () => {
 		if (!tempCartProduct.size) return;
-		//console.log(tempCartProduct);
 		addProductToCart(tempCartProduct);
 		router.replace("/cart");
 	};
