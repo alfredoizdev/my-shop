@@ -3,6 +3,12 @@ jobs:
    pull-request:
       runs-on: ubuntu-latest
       steps:
+         - name: Set up node 
+            uses: actions/setup-node@v1
+         - name: Install dependencies
+             run: npm install
+         - name: Run tests 
+             run: npm test
          - uses: actions/checkout@v2
          - name: pull-request
            uses: repo-sync/pull-request@v2
