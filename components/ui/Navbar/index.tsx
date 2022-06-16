@@ -21,7 +21,7 @@ import {
 } from "@mui/icons-material";
 
 const Navbar: FC = () => {
-	const { asPath, push } = useRouter();
+	const router = useRouter();
 	const { toggleSideMenu } = useContext(UiContext);
 	const { numberOfItems } = useContext(CartContext);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +31,7 @@ const Navbar: FC = () => {
 		if (searchTerm.trim().length === 0) {
 			return;
 		}
-		push(`/search/${searchTerm}`);
+		router.push(`/search/${searchTerm}`);
 		setIsSearchVisible(false);
 	};
 
@@ -56,7 +56,11 @@ const Navbar: FC = () => {
 					<NextLink href="/category/man" passHref>
 						<Link>
 							<Button
-								color={asPath === "/category/man" ? "primary" : "info"}
+								color={
+									router?.asPath === "/category/man"
+										? "primary"
+										: "info"
+								}
 							>
 								Man
 							</Button>
@@ -66,7 +70,9 @@ const Navbar: FC = () => {
 						<Link>
 							<Button
 								color={
-									asPath === "/category/woman" ? "primary" : "info"
+									router?.asPath === "/category/woman"
+										? "primary"
+										: "info"
 								}
 							>
 								Woman
@@ -76,7 +82,11 @@ const Navbar: FC = () => {
 					<NextLink href="/category/kids" passHref>
 						<Link>
 							<Button
-								color={asPath === "/category/kids" ? "primary" : "info"}
+								color={
+									router?.asPath === "/category/kids"
+										? "primary"
+										: "info"
+								}
 							>
 								kids
 							</Button>
