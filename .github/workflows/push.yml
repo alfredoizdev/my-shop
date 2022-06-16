@@ -3,16 +3,14 @@ jobs:
    build:
       runs-on: ubuntu-latest
 
-      steps:
-         - uses: actions/checkout@v3
-         - name: Use Node.js
-           uses: actions/setup-node@v3
-           with:
-              node-version: "12.x"
-         - name: Install dependencies
-           run: npm install
-         - name: Run ci test
-         - run: npm test
+     steps:
+        - uses: actions/checkout@v3
+        - name: Use Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '12.x'
+        - name: Install dependencies
+          run: npm test
    pull-request:
       runs-on: ubuntu-latest
       steps:
