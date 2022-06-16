@@ -9,7 +9,7 @@ jobs:
            uses: actions/setup-node@v3
            with:
               node-version: "12.x"
-         - run: npm test:ci
+         - run: npm test
    pull-request:
       runs-on: ubuntu-latest
       steps:
