@@ -10,9 +10,9 @@ jobs:
               node-version: "12.x"
               cache: "npm"
          - name: Intall dependecies
-           run: npm install
+           run: yarn install
          - name: Run Test
-           run: npm test
+           run: yarn test
 
    pull-request:
       runs-on: ubuntu-latest
